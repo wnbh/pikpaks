@@ -80,12 +80,13 @@ const loginPost = async () => {
     const captchaRes = await http.post('https://user.mypikpak.com/v1/shield/captcha/init', {
       device_id: "0",
       client_id: "YNxT9w7GMdWvEOKa",
-      action: "POST:/v1/auth/signin",
+      action: "POST:/v1/shield/captcha/init",
       meta: {
         email: loginData.value.username
       }
     })
     const captcha_token = captchaRes.data?.captcha_token
+    console.log(captcha_token)
     if (!captcha_token) {
       message.error('获取验证码令牌失败')
       loading.value = false
@@ -97,10 +98,8 @@ const loginPost = async () => {
       'https://user.mypikpak.com/v1/auth/signin',
       {
         client_id: "YNxT9w7GMdWvEOKa",
-        client_secret: "dbw2OtmVEeuUvIptb1Coyg",
         username: loginData.value.username,
         password: loginData.value.password,
-        captcha_token: ""
       },
       {
         headers: {
