@@ -93,7 +93,7 @@ const loginPost = async () => {
     }
     // --------第二步：登录接口，⚠️必须使用英文半角短横杠 X-Captcha-Token--------
     const signinRes = await http.post(
-      'https://user.mypikpak.com/v1/auth/signin',
+      '/pikpak-api/v1/auth/signin',
       {
         client_id: "YNxT9w7GMdWvEOKa",
         username: loginData.value.username,
