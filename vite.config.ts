@@ -12,6 +12,11 @@ export default defineConfig(({mode}) => {
         '/v1/pages': {
           target: 'https://api.notion.com',
           changeOrigin: true,
+        },
+        '/pikpak-api': {
+          target: 'https://user.mypikpak.com',
+          changeOrigin: true,
+          rewrite: path => path.replace(/^\/pikpak-api/,'')
         }
       }
     }
