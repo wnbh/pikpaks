@@ -14,9 +14,10 @@ async function handleRequest(event) {
   //请求头部、返回对象
   let reqHeaders = new Headers(request.headers),
       outBody, outStatus = 200, outStatusText = 'OK', outCt = null, outHeaders = new Headers({
-          "Access-Control-Allow-Origin": reqHeaders.get('Origin'),
+          "Access-Control-Allow-Origin": reqHeaders.get('Origin') || '*',
           "Access-Control-Allow-Methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
-          "Access-Control-Allow-Headers": reqHeaders.get('Access-Control-Allow-Headers') || "Accept, Authorization, Cache-Control, Content-Type, DNT, If-Modified-Since, Keep-Alive, Origin, User-Agent, X-Requested-With, Token, x-access-token, Notion-Version"
+          "Access-Control-Allow-Headers": reqHeaders.get('Access-Control-Allow-Headers') || "Accept, Authorization, Cache-Control, Content-Type, DNT, If-Modified-Since, Keep-Alive, Origin, User-Agent, X-Requested-With, Token, x-access-token, Notion-Version, X-Captcha-Token, x-captcha-token",
+          "Vary": "Origin"
       });
 
   try {
@@ -24,10 +25,24 @@ async function handleRequest(event) {
       let url = request.url.substr(8);
       url = decodeURIComponent(url.substr(url.indexOf('/') + 1));
 
-      //需要忽略的代理
-      if (request.method == "OPTIONS" && reqHeaders.has('access-control-request-headers')) {
-          //输出提示
-          return new Response(null, PREFLIGHT_INIT)
+      // 预检请求（OPTIONS）：直接返回 CORS 放行头。
+      // 关键：回显浏览器请求的 Access-Control-Request-Headers，
+      // 这样登录接口携带的 X-Captcha-Token 等自定义头也能通过预检。
+      if (request.method == "OPTIONS") {
+          const reqOrigin = reqHeaders.get('Origin') || '*';
+          const reqAllowHeaders = reqHeaders.get('Access-Control-Request-Headers') ||
+              "Accept, Authorization, Cache-Control, Content-Type, DNT, If-Modified-Since, Keep-Alive, Origin, User-Agent, X-Requested-With, Token, x-access-token, Notion-Version, X-Captcha-Token, x-captcha-token";
+          const reqMethod = reqHeaders.get('Access-Control-Request-Method') || 'GET, POST, PUT, PATCH, DELETE, OPTIONS';
+          return new Response(null, {
+              status: 204,
+              headers: {
+                  "Access-Control-Allow-Origin": reqOrigin,
+                  "Access-Control-Allow-Methods": reqMethod,
+                  "Access-Control-Allow-Headers": reqAllowHeaders,
+                  "Access-Control-Max-Age": "86400",
+                  "Vary": "Origin, Access-Control-Request-Headers, Access-Control-Request-Method"
+              }
+          })
       }
       else if(url.length < 3 || url.indexOf('.') == -1 || url == "favicon.ico" || url == "robots.txt") {
           return Response.redirect('https://baidu.com', 301)
