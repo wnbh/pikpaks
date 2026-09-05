@@ -9,11 +9,24 @@ instance.interceptors.request.use(request => {
   if (pikpakLogin.access_token) {
     request.headers['Authorization'] = `${pikpakLogin.token_type || 'Bearer'} ${pikpakLogin.access_token}`
   }
-  if(request.url?.indexOf('https://', 4) === -1) {
+  // 跨域代理：相对路径、或 pikpak 官方域名的绝对地址（且尚未被代理）→ 前缀代理地址。
+  // 本地开发与线上部署走同一条链路，避免浏览器直连 PikPak 接口触发 CORS 拦截。
+  const url = request.url || ''
+  let needProxy = true
+  try {
+    if (/^https?:\/\//i.test(url)) {
+      const hostname = new URL(url).hostname
+      // 已是代理地址（非 pikpak 官方域名）则不再代理，防止重复前缀
+      needProxy = /(^|\.)(mypikpak\.com|pikpak\.com)$/i.test(hostname)
+    }
+  } catch (e) {
+    needProxy = true
+  }
+  if (needProxy) {
     const proxyArray = JSON.parse(window.localStorage.getItem('proxy') || '[]')
     if (proxyArray.length > 0) {
       const index = Math.floor((Math.random() * proxyArray.length))
-      request.url = proxyArray[index] + '/' + request.url
+      request.url = proxyArray[index] + '/' + url
     }
   }
   return request
