@@ -86,14 +86,12 @@ const loginPost = async () => {
       }
     })
     const captcha_token = captchaRes.data?.captcha_token
-    console.log(captcha_token)
+    console.log('captcha_token:', captcha_token)
     if (!captcha_token) {
       message.error('获取验证码令牌失败')
-      loading.value = false
       return
     }
-
-    // --------第二步：登录接口，带上X‑Captcha‑Token请求头(PHP逻辑)--------
+    // --------第二步：登录接口，⚠️必须使用英文半角短横杠 X-Captcha-Token--------
     const signinRes = await http.post(
       'https://user.mypikpak.com/v1/auth/signin',
       {
@@ -103,14 +101,12 @@ const loginPost = async () => {
       },
       {
         headers: {
-          "X‑Captcha‑Token": captcha_token
+          "X-Captcha-Token": captcha_token // ✅英文短横杠！！
         }
       }
     )
-
     const res = signinRes.data
     if (res && res.access_token) {
-      // === 下面全部保留原来Vue本地存储逻辑，不改动 ===
       window.localStorage.setItem('pikpakLogin', JSON.stringify(res))
       if (remember.value) {
         window.localStorage.setItem('pikpakLoginData', JSON.stringify(loginData.value))
@@ -122,12 +118,13 @@ const loginPost = async () => {
     } else {
       message.error('登录失败，未获取到access_token')
     }
-
   } catch (err: any) {
-    console.error(err)
+    console.error('登录异常完整对象:', err)
     const errData = err?.response?.data
-    // 对应PHP错误提示
-    if (errData?.error_description === 'verification failed') {
+    // 判断CORS跨域：没有response对象就是浏览器层面拦截，根本没到达后端
+    if (!err?.response) {
+      message.error('浏览器跨域拦截！浏览器环境无法直接调用PikPak登录接口，需要后端代理')
+    } else if (errData?.error_description === 'verification failed') {
       message.error('邮箱不存在')
     } else if (errData?.error_description === 'invalid account or password') {
       message.error('账号或者密码错误')
@@ -138,6 +135,7 @@ const loginPost = async () => {
     loading.value = false
   }
 }
+
 
 const showMessage = () => {
   if (remember.value) {
