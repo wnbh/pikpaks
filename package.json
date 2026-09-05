@@ -1,0 +1,42 @@
+{
+  "name": "pikpak",
+  "version": "1.2.6",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vue-tsc --noEmit && vite build",
+    "serve": "vite preview"
+  },
+  "dependencies": {
+    "axios": "^1.6.8",
+    "clipboard": "^2.0.11",
+    "element-resize-detector": "^1.2.4",
+    "pinia": "^2.1.7",
+    "plyr": "^3.7.8",
+    "qs": "^6.12.0",
+    "streamsaver": "^2.0.6",
+    "vue": "^3.4.21",
+    "vue-gtag": "^2.0.1",
+    "vue-router": "^4.3.0",
+    "vuex": "^4.1.0"
+  },
+  "devDependencies": {
+    "@babel/types": "^7.24.0",
+    "@tabler/icons-vue": "^2.47.0",
+    "@types/ali-oss": "^6.16.11",
+    "@types/crypto-js": "^4.2.2",
+    "@types/dplayer": "^1.25.5",
+    "@types/element-resize-detector": "^1.1.6",
+    "@types/qs": "^6.9.14",
+    "@types/streamsaver": "^2.0.4",
+    "@types/video.js": "^7.3.57",
+    "@vitejs/plugin-vue": "^5.0.4",
+    "ali-oss": "^6.20.0",
+    "comlink": "^4.4.1",
+    "crypto-js": "^4.2.0",
+    "naive-ui": "^2.38.1",
+    "sass": "^1.72.0",
+    "typescript": "^5.3.3",
+    "vite": "^5.2.6",
+    "vue-tsc": "^2.0.7"
+  }
+}
